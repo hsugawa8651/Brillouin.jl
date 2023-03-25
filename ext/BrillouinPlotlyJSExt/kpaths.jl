@@ -35,8 +35,8 @@ end
 
 # ---------------------------------------------------------------------------------------- #
 
-function plot(kp::KPath{2}, layout::Layout = Layout();
-              config::PlotConfig = PlotConfig(responsive=true, displaylogo=false))
+function make_traces_and_layout(kp::KPath{2}, layout::Layout = Layout())
+
     setting(kp) !== CARTESIAN && (kp = cartesianize(kp))
     layout = merge(DEFAULT_PLOTLY_LAYOUT_2D, layout)
 
@@ -56,7 +56,14 @@ function plot(kp::KPath{2}, layout::Layout = Layout();
             hoverinfo="text",
             marker=attr(color=KPATH_COL[], size=8, line=attr(color="white", width=1)))
     end
-    return plot(vcat(tpoints, tpaths), layout; config=config)
+    ts = vcat(tpoints, tpaths)
+    return ts, layout
+end
+
+function plot(kp::KPath{2}, layout::Layout = Layout();
+        config::PlotConfig = PlotConfig(responsive=true, displaylogo=false))
+    ts, layout = make_traces_and_layout(kp, layout)
+    return PlotlyJS.plot(ts, layout; config=config)
 end
 # ---------------------------------------------------------------------------------------- #
 
