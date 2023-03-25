@@ -17,4 +17,6 @@ include("dispersion.jl")
 include("wignerseitz.jl")
 include("kpaths.jl")
 
+export make_traces_and_layout
+
 end # BrillouinPlotlyJSExt

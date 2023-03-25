@@ -31,8 +31,7 @@ const DEFAULT_PLOTLY_LAYOUT_3D  = Layout(
 # ---------------------------------------------------------------------------------------- #
 # 3D
 
-function plot(c::Cell{3}, layout::Layout = Layout();
-              config::PlotConfig = PlotConfig(responsive=true, displaylogo=false))
+function make_traces_and_layout(c::Cell{3}, layout::Layout = Layout())
 
     layout = merge(DEFAULT_PLOTLY_LAYOUT_3D, layout)
 
@@ -111,6 +110,12 @@ function plot(c::Cell{3}, layout::Layout = Layout();
 
     # combine traces and plot
     ts = vcat(tbz, tgs, tgtips, taxs, taxtips)
+    return ts, layout
+end
+
+function plot(c::Cell{3}, layout::Layout = Layout();
+        config::PlotConfig = PlotConfig(responsive=true, displaylogo=false))
+    ts, layout = make_traces_and_layout(c, layout)
     return PlotlyJS.plot(ts, layout; config=config)
 end
 
