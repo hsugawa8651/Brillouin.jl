@@ -68,15 +68,12 @@ end
 # ---------------------------------------------------------------------------------------- #
 
 
-function plot(c::Cell{D}, kp::KPath{D}, layout::Layout = Layout();
-              config::PlotConfig = PlotConfig(responsive=true, displaylogo=false)
+function make_traces_and_layout(c::Cell{D}, kp::KPath{D}, layout::Layout = Layout()
               ) where D
 
     D ∉ (2,3) && error("must be 2D or 3D Cell and KPath")
     # ::Cell
-    Pᶜ  = plot(c, layout) # modifies `layout`; gets stored in resulting `Pᶜ`
-    tsᶜ = Pᶜ.plot.data
-    layout′ = Pᶜ.plot.layout # grab modified `layout`
+    tsᶜ, layout′ = make_traces_and_layout(c, layout)
 
     # get rid of "inside" axis lines; can be identified based on color
     filter!(tsᶜ) do t
@@ -88,11 +85,18 @@ function plot(c::Cell{D}, kp::KPath{D}, layout::Layout = Layout();
     end
 
     # ::KPath
-    Pᵏᵖ  = plot(kp, layout′)
-    tsᵏᵖ = Pᵏᵖ.plot.data
+    tsᵏᵖ, layout′′ = make_traces_and_layout(kp, layout′)
 
     # combine traces and plot
     ts = vcat(tsᶜ, tsᵏᵖ)
+    return ts, layout′
+end
+
+function plot(c::Cell{D}, kp::KPath{D}, layout::Layout = Layout();
+    config::PlotConfig = PlotConfig(responsive=true, displaylogo=false)
+    ) where D
+
+    ts, layout′ = make_traces_and_layout(c, kp, layout)
     return PlotlyJS.plot(ts, layout′; config=config)
 end
 
